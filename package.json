@@ -1,0 +1,11 @@
+{
+  "name": "aurum",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "price": "npx tsx ts/pricing.ts",
+    "report": "python3 python/analytics.py",
+    "check": "javac -d java/out java/LeadCheck.java && java -cp java/out LeadCheck"
+  }
+}
