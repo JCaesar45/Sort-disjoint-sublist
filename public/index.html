@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AURUM — Timepieces for the Few</title>
+    <style>
+      :root {
+        --bg: #07070a;
+        --card: #101015;
+        --gold: #d4af6a;
+        --gold2: #f3e2b3;
+        --txt: #ece8df;
+        --mut: #8d8a82;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--txt);
+        font-family: Georgia, "Times New Roman", serif;
+        line-height: 1.6;
+      }
+      canvas#fx {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      main,
+      header,
+      footer {
+        position: relative;
+        z-index: 1;
+      }
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.4rem 6vw;
+      }
+      .logo {
+        letter-spacing: 0.5em;
+        color: var(--gold);
+        font-size: 1.1rem;
+      }
+      nav a {
+        color: var(--txt);
+        text-decoration: none;
+        margin-left: 2rem;
+        font:
+          0.8rem/1 system-ui,
+          sans-serif;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+      nav a:hover {
+        color: var(--gold);
+      }
+      .hero {
+        min-height: 80vh;
+        display: grid;
+        place-content: center;
+        text-align: center;
+        padding: 0 6vw;
+      }
+      .hero h1 {
+        font-size: clamp(2.6rem, 8vw, 6.5rem);
+        font-weight: 400;
+        line-height: 1.05;
+        background: linear-gradient(
+          100deg,
+          var(--gold),
+          var(--gold2),
+          var(--gold)
+        );
+        background-size: 200%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: shine 6s linear infinite;
+      }
+      @keyframes shine {
+        to {
+          background-position: 200% 0;
+        }
+      }
+      .hero p {
+        color: var(--mut);
+        max-width: 34rem;
+        margin: 1.5rem auto 2.5rem;
+        font-size: 1.15rem;
+      }
+      .btn {
+        display: inline-block;
+        padding: 1rem 2.4rem;
+        border: 1px solid var(--gold);
+        color: var(--gold);
+        background: none;
+        text-decoration: none;
+        font:
+          0.8rem/1 system-ui,
+          sans-serif;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .btn:hover {
+        background: var(--gold);
+        color: #000;
+        box-shadow: 0 0 40px rgba(212, 175, 106, 0.35);
+      }
+      section {
+        padding: 6rem 6vw;
+      }
+      h2 {
+        font-weight: 400;
+        font-size: 2rem;
+        text-align: center;
+        margin-bottom: 3rem;
+        color: var(--gold2);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.8rem;
+        max-width: 1100px;
+        margin: auto;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid #1e1e26;
+        padding: 2rem;
+        transform-style: preserve-3d;
+        transition:
+          transform 0.15s,
+          border-color 0.3s;
+      }
+      .card:hover {
+        border-color: var(--gold);
+      }
+      .card .dial {
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        border: 2px solid var(--gold);
+        position: relative;
+        background: radial-gradient(circle, #1b1b22, #0b0b0e);
+      }
+      .card .dial::before,
+      .card .dial::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 50%;
+        width: 2px;
+        background: var(--gold);
+        transform-origin: bottom;
+      }
+      .card .dial::before {
+        height: 34px;
+        animation: spin 60s linear infinite;
+      }
+      .card .dial::after {
+        height: 24px;
+        animation: spin 720s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .card h3 {
+        font-weight: 400;
+        text-align: center;
+      }
+      .card .tag {
+        text-align: center;
+        color: var(--mut);
+        font-size: 0.9rem;
+        margin: 0.4rem 0 1rem;
+      }
+      .card .price {
+        text-align: center;
+        color: var(--gold);
+        font-size: 1.4rem;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: 1s;
+      }
+      .reveal.on {
+        opacity: 1;
+        transform: none;
+      }
+      .count {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+      .count div {
+        text-align: center;
+      }
+      .count b {
+        display: block;
+        font-size: 2.4rem;
+        font-weight: 400;
+        color: var(--gold);
+      }
+      .count span {
+        font:
+          0.7rem system-ui,
+          sans-serif;
+        letter-spacing: 0.2em;
+        color: var(--mut);
+        text-transform: uppercase;
+      }
+      form {
+        max-width: 480px;
+        margin: auto;
+        display: grid;
+        gap: 1rem;
+      }
+      input,
+      select {
+        background: var(--card);
+        border: 1px solid #2a2a33;
+        color: var(--txt);
+        padding: 1rem;
+        font:
+          1rem system-ui,
+          sans-serif;
+      }
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--gold);
+      }
+      #msg {
+        text-align: center;
+        min-height: 1.5rem;
+        color: var(--gold2);
+      }
+      footer {
+        text-align: center;
+        color: var(--mut);
+        padding: 3rem;
+        font:
+          0.8rem system-ui,
+          sans-serif;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="fx"></canvas>
+    <header>
+      <nav>
+        <span class="logo">AURUM</span>
+        <div>
+          <a href="#collection">Collection</a>
+          <a href="#waitlist">Waitlist</a>
+        </div>
+      </nav>
+      <div class="hero">
+        <h1>
+          Time, refined
+          <br />
+          to the gram.
+        </h1>
+        <p>
+          Hand-finished movements. Sapphire crystal. Three hundred pieces a
+          year, each one numbered.
+        </p>
+        <div><a class="btn" href="#waitlist">Request Access</a></div>
+        <div class="count" id="count">
+          <div>
+            <b id="d">0</b>
+            <span>Days</span>
+          </div>
+          <div>
+            <b id="h">0</b>
+            <span>Hours</span>
+          </div>
+          <div>
+            <b id="m">0</b>
+            <span>Min</span>
+          </div>
+          <div>
+            <b id="s">0</b>
+            <span>Sec</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <section id="collection">
+        <h2>The Collection</h2>
+        <div class="grid" id="grid"></div>
+      </section>
+      <section id="waitlist" class="reveal">
+        <h2>Join the Private Waitlist</h2>
+        <form id="form" novalidate>
+          <input
+            name="name"
+            placeholder="Full name"
+            autocomplete="name"
+            required
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email address"
+            autocomplete="email"
+            required
+          />
+          <select name="interest">
+            <option value="">Model of interest</option>
+          </select>
+          <button class="btn" type="submit">Reserve My Place</button>
+          <p id="msg" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <footer>© 2026 AURUM Horology. All rights reserved.</footer>
+    <script>
+      (function () {
+        var c = document.getElementById("fx"),
+          x = c.getContext("2d"),
+          P = [],
+          W,
+          H;
+        function size() {
+          W = c.width = innerWidth;
+          H = c.height = innerHeight;
+        }
+        size();
+        addEventListener("resize", size);
+        for (var i = 0; i < 70; i++)
+          P.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: Math.random() * 1.6 + 0.4,
+            v: Math.random() * 0.3 + 0.1,
+            a: Math.random() * 0.5 + 0.2
+          });
+        function frame() {
+          x.clearRect(0, 0, W, H);
+          P.forEach(function (p) {
+            p.y -= p.v;
+            if (p.y < -5) {
+              p.y = H + 5;
+              p.x = Math.random() * W;
+            }
+            x.beginPath();
+            x.arc(p.x, p.y, p.r, 0, 6.2832);
+            x.fillStyle = "rgba(212,175,106," + p.a + ")";
+            x.fill();
+          });
+          requestAnimationFrame(frame);
+        }
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) frame();
+
+        var target = Date.now() + 1000 * 60 * 60 * 24 * 21 + 1000 * 60 * 60 * 7;
+        function tick() {
+          var t = Math.max(0, target - Date.now());
+          document.getElementById("d").textContent = Math.floor(t / 864e5);
+          document.getElementById("h").textContent = Math.floor(
+            (t % 864e5) / 36e5
+          );
+          document.getElementById("m").textContent = Math.floor(
+            (t % 36e5) / 6e4
+          );
+          document.getElementById("s").textContent = Math.floor(
+            (t % 6e4) / 1e3
+          );
+        }
+        tick();
+        setInterval(tick, 1000);
+
+        var io = new IntersectionObserver(
+          function (es) {
+            es.forEach(function (e) {
+              if (e.isIntersecting) {
+                e.target.classList.add("on");
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.15 }
+        );
+        function watch(el) {
+          el.classList.add("reveal");
+          io.observe(el);
+        }
+        document.querySelectorAll(".reveal").forEach(function (el) {
+          io.observe(el);
+        });
+
+        var grid = document.getElementById("grid"),
+          sel = document.querySelector("select");
+        function money(n) {
+          return "$" + n.toLocaleString("en-US");
+        }
+        function render(list) {
+          list.forEach(function (p) {
+            var card = document.createElement("article");
+            card.className = "card";
+            var dial = document.createElement("div");
+            dial.className = "dial";
+            var h = document.createElement("h3");
+            h.textContent = p.name;
+            var t = document.createElement("p");
+            t.className = "tag";
+            t.textContent = p.tagline;
+            var pr = document.createElement("p");
+            pr.className = "price";
+            pr.textContent = money(p.price);
+            card.append(dial, h, t, pr);
+            grid.appendChild(card);
+            watch(card);
+            card.addEventListener("mousemove", function (e) {
+              var r = card.getBoundingClientRect(),
+                dx = (e.clientX - r.left) / r.width - 0.5,
+                dy = (e.clientY - r.top) / r.height - 0.5;
+              card.style.transform =
+                "perspective(700px) rotateY(" +
+                dx * 12 +
+                "deg) rotateX(" +
+                -dy * 12 +
+                "deg)";
+            });
+            card.addEventListener("mouseleave", function () {
+              card.style.transform = "";
+            });
+            var o = document.createElement("option");
+            o.value = p.id;
+            o.textContent = p.name;
+            sel.appendChild(o);
+          });
+        }
+        fetch("/api/products")
+          .then(function (r) {
+            return r.json();
+          })
+          .then(render)
+          .catch(function () {
+            grid.textContent =
+              "Collection unavailable. Start the server with npm start.";
+          });
+
+        var form = document.getElementById("form"),
+          msg = document.getElementById("msg");
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var d = {
+            name: form.name.value.trim(),
+            email: form.email.value.trim(),
+            interest: form.interest.value
+          };
+          if (!d.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) {
+            msg.textContent = "Please enter your name and a valid email.";
+            return;
+          }
+          msg.textContent = "Sending…";
+          fetch("/api/lead", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(d)
+          })
+            .then(function (r) {
+              return r.json().then(function (j) {
+                return { ok: r.ok, j: j };
+              });
+            })
+            .then(function (o) {
+              msg.textContent = o.ok
+                ? "You’re on the list. We’ll be in touch."
+                : o.j.error || "Something went wrong.";
+              if (o.ok) form.reset();
+            })
+            .catch(function () {
+              msg.textContent = "Network error. Please try again.";
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>
